@@ -5,7 +5,7 @@ import random
 import sys
 
 ANCHO = 800
-ALTO = 600
+ALTO = 555
 
 FPS = 60
 BLANCO = (255, 255, 255)
@@ -21,10 +21,10 @@ PUNTUACION_GANADOR = 3
 
 def imagen_random():
     img = []
-    img.append(pygame.image.load("Pong/Assets/bola_amarilla.png"))
-    img.append(pygame.image.load("Pong/Assets/bola_azul.png"))
-    img.append(pygame.image.load("Pong/Assets/bola_roja.png"))
-    img.append(pygame.image.load("Pong/Assets/bola_verde.png"))
+    img.append(pygame.image.load("Assets/bola_amarilla.png"))
+    img.append(pygame.image.load("Assets/bola_azul.png"))
+    img.append(pygame.image.load("Assets/bola_roja.png"))
+    img.append(pygame.image.load("Assets/bola_verde.png"))
     imagen = img[random.randint(0, len(img) - 1)]
     return imagen
 
@@ -82,7 +82,7 @@ class Pelota:
     
 class Raqueta:
     def __init__(self):
-        self.imagen = pygame.image.load("Pong/Assets/raqueta_blanca.png").convert_alpha()
+        self.imagen = pygame.image.load("Assets/raqueta_blanca.png").convert_alpha()
         
         self.ancho, self.alto = self.imagen.get_size()
         
@@ -130,13 +130,20 @@ class Raqueta:
             pelota.x = self.x - pelota.ancho
         
 
-def main():
+def main(modo_de_juego):
     pygame.init()
 
     ventana = pygame.display.set_mode((ANCHO, ALTO))
     pygame.display.set_caption("PONG")
-    fondo_juego = pygame.image.load("Pong/Assets/fondo_juego.png").convert()
-    
+
+    #Cambiamos el fondo de juego dependiendo del seleccionado por el usuario
+    if (modo_de_juego == 1):
+        fondo_juego = pygame.image.load("Assets/fondo_juego_1.png").convert()
+    elif (modo_de_juego == 2):
+        fondo_juego = pygame.image.load("Assets/fondo_juego_2.png").convert()
+    else:
+        fondo_juego = pygame.image.load("Assets/fondo_juego_3.png").convert()
+        
     fuente = pygame.font.Font(None, 60)
 
     pelota = Pelota()
@@ -174,7 +181,7 @@ def main():
         pygame.time.Clock().tick(FPS)
 
         if pelota.puntuacion >= PUNTUACION_GANADOR or pelota.puntuacion_ia >= PUNTUACION_GANADOR:
-            pantalla_final(pelota, 1)
+            pantalla_final(pelota, 1, modo_de_juego)
             pelota.jugando = False
 
         for evento in pygame.event.get():
@@ -205,12 +212,19 @@ def main():
 
     pygame.quit()
     
-def main2():
+def main2(modo_de_juego):
     pygame.init()
 
     ventana = pygame.display.set_mode((ANCHO, ALTO))
     pygame.display.set_caption("PONG")
-    fondo_juego = pygame.image.load("Pong/Assets/fondo_juego.png").convert()
+
+    #Cambiamos el fondo de juego dependiendo del seleccionado por el usuario
+    if (modo_de_juego == 1):
+        fondo_juego = pygame.image.load("Assets/fondo_juego_1.png").convert()
+    elif (modo_de_juego == 2):
+        fondo_juego = pygame.image.load("Assets/fondo_juego_2.png").convert()
+    else:
+        fondo_juego = pygame.image.load("Assets/fondo_juego_3.png").convert()
     
     fuente = pygame.font.Font(None, 60)
 
@@ -250,7 +264,7 @@ def main2():
         pygame.time.Clock().tick(FPS)
         
         if pelota.puntuacion >= PUNTUACION_GANADOR or pelota.puntuacion_ia >= PUNTUACION_GANADOR:
-            pantalla_final(pelota, 2)
+            pantalla_final(pelota, 2, modo_de_juego)
             pelota.jugando = False
 
         for evento in pygame.event.get():
@@ -290,6 +304,13 @@ def pintar_boton(ventana_final, boton, palabra):
         draw.rect(ventana_final, ROJO, boton, 0)
     texto = fuente_botones.render(palabra, True, BLANCO)
     ventana_final.blit(texto, (boton.x + (boton.width - texto.get_width())/2, boton.y + (boton.height - texto.get_height())/2))
+
+def dibujar_botones(pantalla, lista_botones):
+    for boton in lista_botones:
+        if boton['on_click']:
+            pantalla.blit(boton['imagen_pressed'], boton['rect'])
+        else:
+            pantalla.blit(boton['imagen'], boton['rect'])
  
     
 def pantalla_inicial(): 
@@ -299,22 +320,49 @@ def pantalla_inicial():
     
     ventana_inicial = pygame.display.set_mode((ANCHO, ALTO))
     pygame.display.set_caption("PONG")
-    fondo_pantalla = pygame.image.load("Pong/Assets/fondo_pantalla_inicial.png").convert()
+    fondo_pantalla = pygame.image.load("Assets/fondo_pantalla_inicial.png").convert()
     
-    fuente = pygame.font.Font(None, 120)    
+    fuente = pygame.font.Font(None, 120)   
+
+    modo_de_juego = 1 
     
-    un_jugador = Rect(200, 400, 150, 50)
-    dos_jugadores = Rect(400, 400, 200, 50)
+    un_jugador = Rect(200, 250, 150, 50)
+    dos_jugadores = Rect(400, 250, 200, 50)
+
+    imagen_boton = pygame.image.load("Assets/modo_juego_1.png")
+    imagen_boton_pressed = pygame.image.load("Assets/modo_juego_1_pressed.png")
+    imagen_boton_2 = pygame.image.load("Assets/modo_juego_2.png")
+    imagen_boton_pressed_2 = pygame.image.load("Assets/modo_juego_2_pressed.png")
+    imagen_boton_3 = pygame.image.load("Assets/modo_juego_3.png")
+    imagen_boton_pressed_3 = pygame.image.load("Assets/modo_juego_3_pressed.png")
+    rect_boton_1 = imagen_boton.get_rect()
+    rect_boton_2 = imagen_boton.get_rect()
+    rect_boton_3 = imagen_boton.get_rect()
+    botones = []
+    rect_boton_1.topleft = [50, 350]
+    rect_boton_2.topleft = [300, 350]
+    rect_boton_3.topleft = [550, 350]
+    botones.append(
+        {'numero': 1, 'imagen': imagen_boton, 'imagen_pressed': imagen_boton_pressed, 'rect': rect_boton_1,
+        'on_click': True})
+    botones.append(
+        {'numero': 2, 'imagen': imagen_boton_2, 'imagen_pressed': imagen_boton_pressed_2, 'rect': rect_boton_2,
+        'on_click': False})
+    botones.append(
+        {'numero': 3, 'imagen': imagen_boton_3, 'imagen_pressed': imagen_boton_pressed_3, 'rect': rect_boton_3,
+        'on_click': False})
     
     while(activa):
         ventana_inicial.blit(fondo_pantalla, [0, 0])
         
         texto = f"Ping Pong"
         letrero = fuente.render(texto, False, BLANCO)
-        ventana_inicial.blit(letrero, (ANCHO / 2 - fuente.size(texto)[0] / 2, 200))
+        ventana_inicial.blit(letrero, (ANCHO / 2 - fuente.size(texto)[0] / 2, 100))
         
         pintar_boton(ventana_inicial, un_jugador, "1 jugador")
         pintar_boton(ventana_inicial, dos_jugadores, "2 jugadores")
+        
+        dibujar_botones(ventana_inicial, botones)
         
         pygame.display.flip()
         pygame.time.Clock().tick(FPS)
@@ -324,15 +372,26 @@ def pantalla_inicial():
                 activa = False
             if evento.type == MOUSEBUTTONDOWN and evento.button == 1:
                 if un_jugador.collidepoint(mouse.get_pos()):
-                    print('click boton un jugador')
-                    main()
-                if dos_jugadores.collidepoint(mouse.get_pos()):
-                    print('click boton dos jugadores')
-                    main2()
-                activa = False
+                    print('click boton un jugador modo de juego ', modo_de_juego)
+                    main(modo_de_juego)
+                    activa = False
+                elif dos_jugadores.collidepoint(mouse.get_pos()):
+                    print('click boton dos jugadores modo de juego ', modo_de_juego)
+                    main2(modo_de_juego)
+                    activa = False
+                else:
+                    for boton in botones:
+                        collidepoint = boton['rect'].collidepoint(mouse.get_pos())
+                        if(collidepoint):
+                            for boton in botones:
+                                collidepoint = boton['rect'].collidepoint(mouse.get_pos())
+                                boton['on_click'] = collidepoint
+                                if(collidepoint):
+                                    modo_de_juego = boton['numero']
+                
     pygame.quit()
     
-def pantalla_final(pelota, num_jugadores):   
+def pantalla_final(pelota, num_jugadores, modo_de_juego):   
     pygame.init()
      
     activa = True
@@ -372,9 +431,9 @@ def pantalla_final(pelota, num_jugadores):
                 if reiniciar.collidepoint(mouse.get_pos()):
                     print('click boton reiniciar')
                     if num_jugadores == 1:
-                        main()
+                        main(modo_de_juego)
                     if num_jugadores == 2:
-                        main2()
+                        main2(modo_de_juego)
     pygame.quit()
 
 if __name__ == "__main__":
